@@ -10,3 +10,7 @@ Master should receive and send a address of worker(slave)
 open a new connection to slave
 
 Get the data from slave
+
+#Requirements
+Python 3.6
+[Add the versions of packages if used]

@@ -4,13 +4,14 @@ from utils import *
 from config_port_address import *
 
 
-
+skt=0
 
 def OR(op,**kwparams):
     '''This func should send a OR request to server and get the results back
     op: operation name such as ADD,SUB
     kwparams: list of operands
     '''
+    global skt
     operation={
         'OP':op,
         **kwparams
@@ -32,6 +33,33 @@ def OR(op,**kwparams):
 
     #get the reply from master to receive address of slave
     message,master_ip_address = receiveMessage(skt)
-    print(message)
-    return
-OR('ADD',k=2,t=4)
+    return message
+
+
+def getSlaveAddress(response):
+    '''
+
+    :param response: a JSON response for a OR
+    :return:
+    '''
+    return response["slave"]
+
+reply_from_master = None
+try:
+    reply_from_master = OR('ADD',k=2,t=4)
+    print(reply_from_master)
+except socket.error as socketerror:
+    print("Timeout Error from master. retry later")
+
+response_from_master=json.loads(reply_from_master)
+
+slave_ip = None
+try:
+    slave_ip=getSlaveAddress(response_from_master)
+    #get the message from slave
+    response_ip = None
+    result=None
+    while response_ip != slave_ip: #check whethere the response is from the slave or imposter
+        msg,response_ip = receiveMessage(skt)
+except socket.error as socketerror:
+    print("Timreout Error with slave")
