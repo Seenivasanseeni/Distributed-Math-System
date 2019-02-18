@@ -31,3 +31,12 @@ def sendMessage(skt,message,address_tuple):
     '''
     skt.sendto(bytes(message,encoding='UTF-8'),address_tuple)
     return
+
+def receiveMessageTCP(skt):
+    '''
+
+    :param skt: a connected TCP socket
+    :return:
+    '''
+    message= skt.recv(1024).decode('UTF-8') #todo find a way if there are many packets in stream
+    return message

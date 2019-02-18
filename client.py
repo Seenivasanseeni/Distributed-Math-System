@@ -5,27 +5,47 @@ from config_port_address import *
 
 
 skt=0
-
-def OR(op,**kwparams):
-    '''This func should send a OR request to server and get the results back
-    op: operation name such as ADD,SUB
-    kwparams: list of operands
+operation = {} #empty operation
+operation_str = ""
+def makeOperation(op,**kwparams):
     '''
-    global skt
+
+    :param op: operator like ADD, SUB. DIV
+    :param kwparams: operands 12 34
+    :return:
+    '''
+    global  operation,operation_str
     operation={
         'OP':op,
         **kwparams
     }
     operation_str=json.dumps(operation)
+    return
+
+makeOperation("ADD",op1=12,op2=34)
+
+def OR():
+    '''This func should send a OR request to server and get the results back
+    op: operation name such as ADD,SUB
+    kwparams: list of operands
+    '''
+    global skt,operation,operation_str
 
     #create a socket
     skt = socket.socket(type=socket.SOCK_DGRAM)
 
-    #set a timeout
-    skt.settimeout(10)
+    try:
+        #set a timeout
+        skt.settimeout(10)
 
-    #send the message to master
-    skt.sendto(bytes(operation_str,encoding='UTF-8'),(MASTER_UDP_ADDRESS,MASTER_UDP_LISTEN_CLIENT_PORT))
+        #send the message to master
+        skt.sendto(bytes(operation_str,encoding='UTF-8'),(MASTER_UDP_ADDRESS,MASTER_UDP_LISTEN_CLIENT_PORT))
+
+    except socket.error as socketerror:
+        print("Error connecting to master",socketerror)
+
+    #close the connection
+    skt.close()
 
     #reintialize a socket and listen on a port - we can use the above socket itself and bind it
     skt = socket.socket(type=socket.SOCK_DGRAM)
@@ -33,6 +53,9 @@ def OR(op,**kwparams):
 
     #get the reply from master to receive address of slave
     message,master_ip_address = receiveMessage(skt)
+
+    #close the connection
+    skt.close()
     return message
 
 
@@ -46,7 +69,7 @@ def getSlaveAddress(response):
 
 reply_from_master = None
 try:
-    reply_from_master = OR('ADD',k=2,t=4)
+    reply_from_master = OR()
     print(reply_from_master)
 except socket.error as socketerror:
     print("Timeout Error from master. retry later")
@@ -54,12 +77,15 @@ except socket.error as socketerror:
 response_from_master=json.loads(reply_from_master)
 
 slave_ip = None
+
 try:
     slave_ip=getSlaveAddress(response_from_master)
-    #get the message from slave
-    response_ip = None
-    result=None
-    while response_ip != slave_ip: #check whethere the response is from the slave or imposter
-        msg,response_ip = receiveMessage(skt)
+
+    #open a TCP connection to slave
+    skt = socket.socket(type=socket.SOCK_STREAM)
+    skt.connect((slave_ip,SLAVE_CLIENT_SERVER_PORT))
+    result = receiveMessageTCP(skt)
+    print("RESULT:",result)
+
 except socket.error as socketerror:
-    print("Timreout Error with slave")
+    print("Timeout Error with slave")
