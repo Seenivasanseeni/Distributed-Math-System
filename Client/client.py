@@ -54,3 +54,14 @@ operation={
     "token":token
 }
 
+operation_str = json.dumps(operation)
+
+utils.sendMessageTCP(skt,operation_str)
+
+
+response_from_slave_str = utils.receiveMessageTCP(skt)
+
+response_from_slave = json.loads(response_from_slave_str)
+
+result_op = response_from_slave["result"]
+print("RESULT:",result_op)
