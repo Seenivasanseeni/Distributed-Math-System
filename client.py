@@ -86,6 +86,7 @@ try:
     skt.connect((slave_ip,SLAVE_CLIENT_SERVER_PORT))
     result = receiveMessageTCP(skt)
     print("RESULT:",result)
+    skt.close()
 
 except socket.error as socketerror:
     print("Timeout Error with slave")
