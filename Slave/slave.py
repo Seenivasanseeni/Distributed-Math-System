@@ -3,10 +3,16 @@ import socket
 import utils
 import threading
 
-MASTER_ADDRESS = 'localhost'
-MASTER_TCP_PORT_CONNECT_SLAVE = 9001
 
-SLAVE_TCP_PORT_CLIENT = 10001
+MASTER_ADDRESS = 'localhost'
+MASTER_TCP_PORT_CLIENT = 9000
+MASTER_TCP_PORT_SLAVE = 9001
+
+SLAVE_TCP_PORT_CLIENT = 8000
+
+
+MASTER_TCP_PORT_CONNECT_SLAVE = 9002
+
 skt_master = None
 skt_client_server = None
 
@@ -35,9 +41,9 @@ def connect_to_master():
         connect the slave to the master
     :return: a connected socket
     '''
-    print("Trying to connect to master")
+    print("Trying to connect to master at {}:{}".format(MASTER_ADDRESS,MASTER_TCP_PORT_SLAVE))
     skt = socket.socket(type=socket.SOCK_STREAM)
-    skt.connect((MASTER_ADDRESS,MASTER_TCP_PORT_CONNECT_SLAVE))
+    skt.connect((MASTER_ADDRESS,MASTER_TCP_PORT_SLAVE))
     connect = {
         "action":"connect",
     }
@@ -47,6 +53,10 @@ def connect_to_master():
     return skt
 
 def slave_thread():
+    '''
+    This thread is to serve users which is initiated by master
+    :return:
+    '''
     skt = connect_to_master()
     print("Listening for message from master")
     while True:
