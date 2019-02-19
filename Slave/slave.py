@@ -32,7 +32,7 @@ def connect_to_master():
     :return: a connected socket
     '''
     skt = socket.socket(type=socket.SOCK_STREAM)
-    skt.connect((MASTER_ADDRESS,))
+    skt.connect((MASTER_ADDRESS,MASTER_TCP_PORT_CONNECT_SLAVE))
     connect = {
         "action":"connect",
     }
@@ -54,3 +54,5 @@ def slave_thread():
         newClient.start()
 
 driverThread = threading.Thread(target=slave_thread)
+driverThread.start()
+driverThread.join()
