@@ -41,7 +41,8 @@ response_from_master = json.loads(response_from_master_str)
 
 token = response_from_master["token"]
 slave_address = response_from_master["slave"]
-
+print(response_from_master)
+input()
 skt.close()
 
 #make a connection to slave
