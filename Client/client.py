@@ -49,7 +49,7 @@ skt.close()
 token = response_from_master["token"]
 slave_address = response_from_master["slave"]
 
-print("Trying to connect to slave {}:{}".format(slave_address,SLAVE_TCP_PORT_CLIENT))
+print("Exp Failure: Trying to connect to slave {}:{}".format(slave_address,SLAVE_TCP_PORT_CLIENT))
 
 #open a new socket and make a connection to slave
 skt = socket.socket(type=socket.SOCK_STREAM)
