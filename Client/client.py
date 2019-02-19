@@ -28,22 +28,24 @@ def make_operation(op,**kwparams):
 
 
 operation_str = json.dumps({})
-
+print("Connecting to Master...")
 skt = socket.socket(type=socket.SOCK_STREAM)
 
 skt.connect((MASTER_ADDRESS,MASTER_TCP_PORT))
+print("Connection to Master successful...")
 
+print("Sending message..",operation_str)
 utils.sendMessageTCP(skt,operation_str)
+print("Message send done")
 
 response_from_master_str = utils.receiveMessageTCP(skt)
 
 response_from_master = json.loads(response_from_master_str)
-
+print(response_from_master)
+skt.close()
+input()
 token = response_from_master["token"]
 slave_address = response_from_master["slave"]
-print(response_from_master)
-input()
-skt.close()
 
 #make a connection to slave
 skt.connect((slave_address,SLAVE_TCP_PORT))
