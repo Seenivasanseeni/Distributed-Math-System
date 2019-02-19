@@ -53,24 +53,30 @@ print("Exp Failure: Trying to connect to slave {}:{}".format(slave_address,SLAVE
 
 #open a new socket and make a connection to slave
 skt = socket.socket(type=socket.SOCK_STREAM)
-skt.connect((slave_address,SLAVE_TCP_PORT_CLIENT))
-print("Connection to Slave successful...")
-input()
-operation = make_operation("ADD",op1=12,op2=34)
+#set a timeout
+skt.settimeout(100)
 
-operation={
-    **operation,
-    "slave":slave_address,
-    "token":token
-}
+while True:
+    try:
+        skt.connect((slave_address,SLAVE_TCP_PORT_CLIENT))
+        print("Connection to Slave successful...")
+        operation = make_operation("ADD",op1=12,op2=34)
 
-operation_str = json.dumps(operation)
+        operation={
+            **operation,
+            "slave":slave_address,
+            "token":token
+        }
 
-utils.sendMessageTCP(skt,operation_str)
+        operation_str = json.dumps(operation)
+        utils.sendMessageTCP(skt,operation_str)
 
-response_from_slave_str = utils.receiveMessageTCP(skt)
-print(response_from_slave_str)
-response_from_slave = json.loads(response_from_slave_str)
+        response_from_slave_str = utils.receiveMessageTCP(skt)
+        print("Result from SLAVE:",response_from_slave_str)
+        response_from_slave = json.loads(response_from_slave_str)
 
-result_op = response_from_slave["result"]
-print("RESULT:",result_op)
+        result_op = response_from_slave["result"]
+        print("RESULT:",result_op)
+        input("Press Enter to continue")
+    except:
+        print("Error connecting to Slave...")

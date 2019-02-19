@@ -58,9 +58,9 @@ def connect_clients():
             "token": token
         }
         response_slave_str = json.dumps((response_slave))
-        print("Sending Client info to Client...")
+        print("Sending Client info to Slave...")
         utils.sendMessageTCP(slave_socket,response_slave_str)
-        print("Sending Client info to Client done...")
+        print("Sending Client info to Slave done...")
 
     print("Service for Clients is closing")
 
